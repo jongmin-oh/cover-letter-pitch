@@ -24,12 +24,14 @@ JD 입력 + 후보자 경험
 ## 설치
 
 ### Claude Code
-사용자 전역으로 쓰려면 `~/.claude/skills/` 아래에 두고, 특정 프로젝트에만 쓰려면 그 프로젝트의 `.claude/skills/` 아래에 둡니다.
+레포를 스킬 폴더로 바로 클론하면 됩니다. 전역으로 쓰려면 `~/.claude/skills/` 아래에, 특정 프로젝트에만 쓰려면 그 프로젝트의 `.claude/skills/` 아래에 둡니다.
 
 ```bash
-# 전역 설치
-git clone <this-repo> /tmp/cover-letter-pitch-skill
-cp -r /tmp/cover-letter-pitch-skill/cover-letter-pitch ~/.claude/skills/cover-letter-pitch
+# 전역 설치 (모든 프로젝트에서 사용)
+git clone https://github.com/jongmin-oh/cover-letter-pitch ~/.claude/skills/cover-letter-pitch
+
+# 또는 특정 프로젝트에만
+git clone https://github.com/jongmin-oh/cover-letter-pitch .claude/skills/cover-letter-pitch
 ```
 
 설치 후 `/cover-letter-pitch` 로 호출하거나, 그냥 "이 JD로 자기소개서 써줘"라고 요청하면 description 트리거로 자동 호출됩니다.
