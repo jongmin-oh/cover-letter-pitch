@@ -1,7 +1,7 @@
 ---
 name: cover-letter-pitch
 description: >-
-  JD(채용공고)와 후보자 경험을 입력받아 서류 합격 확률을 최대화하는 맞춤형 자기소개서/커버레터를 작성한다.
+  JD(채용공고)와 이력서를 입력받아 서류 합격 확률을 최대화하는 맞춤형 자기소개서/커버레터를 작성한다.
   사실 나열이 아니라 후보자의 판단 흐름과 임팩트를 JD의 Pain Point에 맞춰 어필한다.
   Use when the user provides a job description and their experience (resume/portfolio)
   and asks to write a cover letter, 자기소개서, or 자소서. Generates a tailored,

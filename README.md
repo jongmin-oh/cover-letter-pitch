@@ -23,8 +23,11 @@ JD 입력 + 후보자 경험
 
 ## 설치
 
-### Claude Code
-레포를 스킬 폴더로 바로 클론하면 됩니다. 전역으로 쓰려면 `~/.claude/skills/` 아래에, 특정 프로젝트에만 쓰려면 그 프로젝트의 `.claude/skills/` 아래에 둡니다.
+두 가지 방법 중 하나를 고르세요. **방법 1(스킬 디렉터리 클론)이 가장 간단**합니다.
+
+### 방법 1 — 스킬 디렉터리에 클론 (권장)
+
+레포를 스킬 폴더로 바로 클론합니다. 전역으로 쓰려면 `~/.claude/skills/` 아래에, 특정 프로젝트에만 쓰려면 그 프로젝트의 `.claude/skills/` 아래에 둡니다.
 
 ```bash
 # 전역 설치 (모든 프로젝트에서 사용)
@@ -34,9 +37,21 @@ git clone https://github.com/jongmin-oh/cover-letter-pitch ~/.claude/skills/cove
 git clone https://github.com/jongmin-oh/cover-letter-pitch .claude/skills/cover-letter-pitch
 ```
 
-설치 후 `/cover-letter-pitch` 로 호출하거나, 그냥 "이 JD로 자기소개서 써줘"라고 요청하면 description 트리거로 자동 호출됩니다.
+다음 세션부터 자동 로드됩니다. `/cover-letter-pitch` 로 호출하거나, 그냥 "이 JD로 자기소개서 써줘"라고 요청하면 description 트리거로 자동 호출됩니다.
+
+### 방법 2 — 플러그인으로 로컬 테스트
+
+레포에 `.claude-plugin/plugin.json` 매니페스트가 있어 플러그인으로도 로드됩니다. 설치 없이 바로 띄워 테스트할 때 유용합니다.
+
+```bash
+# 레포를 클론한 위치에서
+claude --plugin-dir /path/to/cover-letter-pitch
+```
+
+플러그인으로 로드하면 스킬이 네임스페이스로 호출됩니다 — `/cover-letter-pitch:cover-letter-pitch`. (정확한 이름은 `/help`에서 확인 가능합니다.)
 
 ### Claude (claude.ai)
+
 `SKILL.md`를 커스텀 스킬/프로젝트 지침으로 등록하면 동일하게 동작합니다.
 
 ## 사용법
