@@ -1,6 +1,6 @@
 # cover-letter-pitch — 맞춤형 자기소개서 작성 스킬
 
-JD(채용공고)와 본인 경험을 입력하면, **여는 문장 + 정해진 4블록 패턴으로 한국어 자기소개서**를 작성하는 Claude / Claude Code 스킬입니다.
+JD(채용공고)와 본인 경험을 입력하면, **여는 문장 + 정해진 4블록 패턴으로 한국어 자기소개서**를 작성하는 Codex / Claude / Claude Code 스킬입니다.
 
 ## 왜 만들었나
 
@@ -88,23 +88,37 @@ JD 입력 + 후보자 경험
 
 ## 설치
 
-두 가지 방법 중 하나를 고르세요. **방법 1(스킬 디렉터리 클론)이 가장 간단**합니다.
+이 저장소는 Codex와 Claude Code가 함께 읽을 수 있는 `SKILL.md` 형식으로 작성되어 있습니다. 사용하는 도구의 스킬 디렉터리에 저장소를 클론하면 됩니다.
 
-### 방법 1 — 스킬 디렉터리에 클론 (권장)
+### Codex
 
-레포를 스킬 폴더로 바로 클론합니다. 전역으로 쓰려면 `~/.claude/skills/` 아래에, 특정 프로젝트에만 쓰려면 그 프로젝트의 `.claude/skills/` 아래에 둡니다.
+전역으로 쓰려면 `~/.codex/skills/` 아래에, 특정 프로젝트에서만 쓰려면 그 프로젝트의 `.codex/skills/` 아래에 둡니다.
+
+```bash
+# 전역 설치 (모든 프로젝트에서 사용)
+git clone https://github.com/jongmin-oh/cover-letter-pitch ~/.codex/skills/cover-letter-pitch
+
+# 또는 특정 프로젝트에만 설치
+git clone https://github.com/jongmin-oh/cover-letter-pitch .codex/skills/cover-letter-pitch
+```
+
+새 Codex 세션에서 `$cover-letter-pitch`로 직접 호출하거나, “이 JD로 자기소개서 써줘”라고 요청하면 자동으로 선택됩니다.
+
+### Claude Code
+
+전역으로 쓰려면 `~/.claude/skills/` 아래에, 특정 프로젝트에서만 쓰려면 그 프로젝트의 `.claude/skills/` 아래에 둡니다.
 
 ```bash
 # 전역 설치 (모든 프로젝트에서 사용)
 git clone https://github.com/jongmin-oh/cover-letter-pitch ~/.claude/skills/cover-letter-pitch
 
-# 또는 특정 프로젝트에만
+# 또는 특정 프로젝트에만 설치
 git clone https://github.com/jongmin-oh/cover-letter-pitch .claude/skills/cover-letter-pitch
 ```
 
 다음 세션부터 자동 로드됩니다. `/cover-letter-pitch` 로 호출하거나, 그냥 "이 JD로 자기소개서 써줘"라고 요청하면 description 트리거로 자동 호출됩니다.
 
-### 방법 2 — 플러그인으로 로컬 테스트
+#### 플러그인으로 로컬 테스트
 
 레포에 `.claude-plugin/plugin.json` 매니페스트가 있어 플러그인으로도 로드됩니다. 설치 없이 바로 띄워 테스트할 때 유용합니다.
 
