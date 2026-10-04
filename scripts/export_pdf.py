@@ -251,7 +251,7 @@ def build_typst(intro, sections, company, role, name, links):
 
 def guess_company_role(md_path, sections):
     """파일명 `{회사명}-{포지션}.md` 에서 추출하고, 실패하면 소제목에서 회사명을 찾는다."""
-    stem = re.sub(r"[_-]?(자기소개서|자소서|notes)$", "", md_path.stem)
+    stem = re.sub(r"([_-]?(자기소개서|자소서|notes|jd|v\d+))+$", "", md_path.stem)
     company, _, role = stem.partition("-")
     if not role:
         company, _, role = stem.partition("_")
