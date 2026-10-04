@@ -232,6 +232,19 @@ claude --plugin-dir /path/to/cover-letter-pitch
 
 저장 파일에는 제출용 본문만 포함합니다. JD 분석 같은 내부 자료도 요청한 경우에는 `{회사명}-{포지션}-notes.md`로 분리합니다.
 
+### PDF 내보내기
+
+"PDF로 만들어줘"라고 요청하면 저장한 자기소개서를 Pretendard 폰트 기반 **A4 1장 PDF**로 변환합니다. 스크립트를 직접 실행할 수도 있습니다.
+
+```bash
+uv run scripts/export_pdf.py cover-letters/토스-백엔드.md --name 홍길동 --github github.com/hong
+# 또는: pip install typst && python3 scripts/export_pdf.py ...
+```
+
+- 별도 설정이 필요 없습니다. `uv run`이 `typst`를 자동 설치하고, Pretendard가 없으면 첫 실행 때 `~/.cache/cover-letter-pitch/fonts`에 자동으로 내려받습니다.
+- 회사명·포지션은 파일명(`{회사명}-{포지션}.md`)에서 읽습니다. `--company`, `--role`로 바꿀 수 있습니다.
+- 옵션: `--name`, `--email`, `--github`, `--blog`, `--link 라벨=URL`(반복 가능), `-o 출력경로`, `--no-font-download`
+
 ## 핵심 원칙
 
 - 여는 문장으로 내가 어떤 사람인지 먼저 밝히고 본론에 들어간다 — 한 문단 250~300자를 넘기지 않는다

@@ -4,8 +4,9 @@ description: >-
   JD(채용공고)를 기준으로 한국어 자기소개서를 정해진 패턴으로 작성한다.
   `여는 문장 → 내가 할 수 있는 것 3가지 → 내가 줄 수 있는 것 3가지 → 솔직한 단점 → 마지막 멘트`
   순서로 쓰며, JD와 직접 연관된 내용만 담고 누구나 한 번에 읽히는 문장으로 만든다.
+  완성본을 Pretendard 폰트 기반 A4 1장 PDF로 내보낼 수 있다(scripts/export_pdf.py).
   Use when the user provides a job description and their experience and asks to write
-  or revise a 자기소개서 or 자소서.
+  or revise a 자기소개서 or 자소서, or to export one to PDF.
 ---
 
 # Cover Letter Pitch
@@ -331,6 +332,24 @@ A4 한 장(공백 포함 1,800~2,200자) 기준이다.
 사용자가 파일 저장을 요청한 경우에만 `cover-letters/{회사명}-{포지션}.md`에 저장한다. 다른 경로를 지정하면 그 경로를 따른다. 같은 파일이 이미 있으면 덮어쓰기 전에 확인한다.
 
 저장 파일에는 제출용 본문만 넣는다. JD 분석 같은 내부 자료를 제출 파일의 HTML 주석에 숨기지 않는다. 내부 자료 저장도 요청받으면 `{회사명}-{포지션}-notes.md`로 분리한다.
+
+## PDF 내보내기
+
+사용자가 PDF를 요청하면 저장한 `.md`를 이 스킬에 포함된 `scripts/export_pdf.py`로 변환한다. `.md`가 아직 없으면 먼저 `cover-letters/{회사명}-{포지션}.md`로 저장한다. Typst 마크업을 직접 쓰지 않는다. 레이아웃은 스크립트가 정한다.
+
+```bash
+# 스크립트 경로는 이 SKILL.md가 있는 디렉터리 기준이다.
+uv run <skill-dir>/scripts/export_pdf.py cover-letters/{회사명}-{포지션}.md \
+  --name "{지원자 이름}" [--email ...] [--github ...] [--blog ...] [--link 라벨=URL]
+```
+
+- `uv`가 없으면 `python3`로 실행한다. `typst` 모듈이 없다는 오류가 나면 `pip install typst`를 실행해도 되는지 사용자에게 확인한다.
+- 이름·연락처·링크는 사용자 자료(이력서 등)에 있는 것만 넣는다. 없으면 옵션을 생략한다. 지어내지 않는다.
+- 회사명과 포지션은 파일명 `{회사명}-{포지션}`에서 읽는다. 파일명이 다르면 `--company`, `--role`을 넘긴다.
+- 출력은 `.md`와 같은 폴더의 같은 이름 `.pdf`다. `-o`로 바꿀 수 있다.
+- Pretendard가 없으면 처음 실행할 때 `~/.cache/cover-letter-pitch/fonts`에 자동으로 내려받는다. 오프라인이면 시스템 한글 폰트로 대체된다.
+- 입력은 `Step 3 — 제출 형태` 그대로여야 한다. 여는 문장은 박스, `##` 소제목 4개는 구분선 제목, `**1. 선언**`은 번호 배지, 마지막 소제목의 문단은 강조 박스로 렌더링된다.
+- 변환 후 2페이지로 넘어가면 레이아웃을 줄이지 말고 `형식과 분량` 기준으로 본문을 줄인다.
 
 ## 최종 출력 원칙
 
