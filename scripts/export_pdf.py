@@ -5,6 +5,9 @@
 # ///
 """cover-letter-pitch 완성본(.md)을 Pretendard 기반 A4 1장 PDF로 변환한다.
 
+글자 크기와 간격을 가독성 범위에서 자동 조정해 가장 큰 1페이지
+레이아웃을 선택한다. 최소 배율에서도 넘치면 본문 축약을 요청한다.
+
 사용법:
     uv run scripts/export_pdf.py cover-letters/토스-백엔드.md --name 홍길동
     python3 scripts/export_pdf.py cover-letters/토스-백엔드.md --name 홍길동   # pip install typst 필요
@@ -48,6 +51,13 @@ SKILL_FONTS = Path(__file__).resolve().parent.parent / "fonts"
 
 # Pretendard가 없을 때 OS별 한글 폰트로 대체한다.
 FONT_STACK = '("Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans CJK KR", "Noto Sans KR", "NanumGothic")'
+
+# 본문 기준 8.5pt의 배율. 최소값은 약 8pt를 지켜 가독성을 보존하고,
+# 최대값은 짧은 글을 보기 좋게 채우되 과도하게 커지지 않는 상한이다.
+MIN_LAYOUT_SCALE = 0.94
+MAX_LAYOUT_SCALE = 1.12
+FIT_ITERATIONS = 8
+PAGES_RE = re.compile(rb"/Type\s*/Pages\s*/Count\s+(\d+)")
 
 SYSTEM_FONT_DIRS = [
     Path.home() / ".local" / "share" / "fonts",
@@ -143,15 +153,18 @@ def paragraphs(text):
     return "\n\n".join(inline(p) for p in re.split(r"\n\s*\n", text) if p.strip())
 
 
-def build_typst(intro, sections, company, role, name, links):
+def build_typst(intro, sections, company, role, name, links, layout_scale=1.0):
+    def pt(value):
+        return f"{value * layout_scale:.3f}pt"
+
     footer = " — ".join(x for x in [name, f"{company} {role} 지원서"] if x)
     link_rows = " \\\n".join(
-        f'#text(weight: 600, fill: rgb("#475569"))[{esc(label)}] '
+        f'#text(size: {pt(7.8)}, weight: 600, fill: rgb("#475569"))[{esc(label)}] '
         f'#link("{url if "://" in url or url.startswith("mailto:") else "https://" + url}")[{esc(url.split("://")[-1].removeprefix("mailto:"))}]'
         for label, url in links
     )
     title_line = (
-        f'#text(size: 16pt, weight: 800, fill: rgb("#0f172a"))[{esc(name)}] #h(6pt) '
+        f'#text(size: {pt(16)}, weight: 800, fill: rgb("#0f172a"))[{esc(name)}] #h({pt(6)}) '
         if name else ""
     )
 
@@ -160,30 +173,30 @@ def build_typst(intro, sections, company, role, name, links):
   paper: "a4",
   margin: (top: 15mm, bottom: 14mm, left: 18mm, right: 18mm),
   footer: context align(center)[
-    #set text(size: 7.5pt, fill: rgb("#94a3b8"))
+    #set text(size: {pt(7.5)}, fill: rgb("#94a3b8"))
     {esc(footer)}
   ],
 )
-#set text(font: {FONT_STACK}, size: 8.5pt, weight: 400, fill: rgb("#1e293b"), lang: "ko")
+#set text(font: {FONT_STACK}, size: {pt(8.5)}, weight: 400, fill: rgb("#1e293b"), lang: "ko")
 #set par(leading: 0.60em, justify: true, spacing: 0.9em)
 
-#let section_heading(title) = block(above: 9pt, below: 5pt, width: 100%)[
-  #text(size: 10pt, weight: 700, fill: rgb("#0f172a"), title)
-  #v(-3pt)
+#let section_heading(title) = block(above: {pt(9)}, below: {pt(5)}, width: 100%)[
+  #text(size: {pt(10)}, weight: 700, fill: rgb("#0f172a"), title)
+  #v({pt(-3)})
   #line(length: 100%, stroke: 0.6pt + rgb("#cbd5e1"))
 ]
 
-#let item_block(num, title, body) = block(width: 100%, inset: (bottom: 3.5pt))[
-  #set block(spacing: 5pt)
+#let item_block(num, title, body) = block(width: 100%, inset: (bottom: {pt(3.5)}))[
+  #set block(spacing: {pt(5)})
   #grid(
     columns: (auto, 1fr),
-    gutter: 4.5pt,
-    box(fill: rgb("#eff6ff"), radius: 2.5pt, inset: (x: 4.5pt, y: 1.5pt))[#text(size: 7.8pt, weight: 700, fill: rgb("#2563eb"), num)],
-    text(weight: 700, size: 8.5pt, fill: rgb("#0f172a"), title),
+    gutter: {pt(4.5)},
+    box(fill: rgb("#eff6ff"), radius: 2.5pt, inset: (x: {pt(4.5)}, y: {pt(1.5)}))[#text(size: {pt(7.8)}, weight: 700, fill: rgb("#2563eb"), num)],
+    text(weight: 700, size: {pt(8.5)}, fill: rgb("#0f172a"), title),
   )
-  #v(1.5pt)
-  #block(inset: (left: 2pt))[
-    #set text(size: 8.2pt, fill: rgb("#334155"))
+  #v({pt(1.5)})
+  #block(inset: (left: {pt(2)}))[
+    #set text(size: {pt(8.2)}, fill: rgb("#334155"))
     #set par(leading: 0.58em)
     #body
   ]
@@ -192,21 +205,21 @@ def build_typst(intro, sections, company, role, name, links):
 // Header
 #grid(
   columns: (1fr, auto),
-  gutter: 10pt,
+  gutter: {pt(10)},
   align: (left + horizon, right + horizon),
   [
-    {title_line}#box(fill: rgb("#eff6ff"), radius: 3pt, inset: (x: 6pt, y: 3pt))[#text(size: 9pt, weight: 700, fill: rgb("#2563eb"))[{esc(role)}]]
-    #v(2pt)
-    #text(size: 8.3pt, weight: 500, fill: rgb("#64748b"))[{esc(company)} 지원]
+    {title_line}#box(fill: rgb("#eff6ff"), radius: 3pt, inset: (x: {pt(6)}, y: {pt(3)}))[#text(size: {pt(9)}, weight: 700, fill: rgb("#2563eb"))[{esc(role)}]]
+    #v({pt(2)})
+    #text(size: {pt(8.3)}, weight: 500, fill: rgb("#64748b"))[{esc(company)} 지원]
   ],
   [
-    #set text(size: 7.8pt, fill: rgb("#64748b"))
+    #set text(size: {pt(7.8)}, fill: rgb("#64748b"))
     #align(right)[{link_rows}]
   ],
 )
-#v(2pt)
+#v({pt(2)})
 #line(length: 100%, stroke: 1.2pt + rgb("#0f172a"))
-#v(3pt)
+#v({pt(3)})
 """
     if intro:
         typ += f"""
@@ -215,13 +228,13 @@ def build_typst(intro, sections, company, role, name, links):
   width: 100%,
   fill: rgb("#f8fafc"),
   stroke: (left: 3.5pt + rgb("#2563eb"), rest: 0.5pt + rgb("#e2e8f0")),
-  inset: (x: 10pt, y: 7.5pt),
+  inset: (x: {pt(10)}, y: {pt(7.5)}),
   radius: (right: 3pt),
 )[
-  #set text(size: 8.3pt, fill: rgb("#334155"))
+  #set text(size: {pt(8.3)}, fill: rgb("#334155"))
   {paragraphs(intro)}
 ]
-#v(2pt)
+#v({pt(2)})
 """
     for i, sec in enumerate(sections):
         typ += f"\n#section_heading[{inline(sec['title'])}]\n"
@@ -231,15 +244,15 @@ def build_typst(intro, sections, company, role, name, links):
             continue
         if i == len(sections) - 1 and len(sections) > 1:
             # 마지막 블록(마지막으로)은 강조 박스
-            typ += f"""#rect(width: 100%, fill: rgb("#f1f5f9"), inset: (x: 9pt, y: 6pt), radius: 3pt)[
-  #set text(size: 8.5pt, weight: 600, fill: rgb("#0f172a"))
+            typ += f"""#rect(width: 100%, fill: rgb("#f1f5f9"), inset: (x: {pt(9)}, y: {pt(6)}), radius: 3pt)[
+  #set text(size: {pt(8.5)}, weight: 600, fill: rgb("#0f172a"))
   #set par(leading: 0.58em)
   {paragraphs(sec['body'])}
 ]
 """
         else:
-            typ += f"""#block(width: 100%, inset: (left: 2pt, bottom: 2pt))[
-  #set text(size: 8.2pt, fill: rgb("#334155"))
+            typ += f"""#block(width: 100%, inset: (left: {pt(2)}, bottom: {pt(2)}))[
+  #set text(size: {pt(8.2)}, fill: rgb("#334155"))
   #set par(leading: 0.58em)
   {paragraphs(sec['body'])}
 ]
@@ -264,8 +277,59 @@ def guess_company_role(md_path, sections):
     return company or "회사", role.replace("_", " ").replace("-", " ") or "포지션"
 
 
+def pdf_page_count(pdf_bytes):
+    """Typst가 만든 PDF의 페이지 트리에서 전체 페이지 수를 읽는다."""
+    counts = [int(value) for value in PAGES_RE.findall(pdf_bytes)]
+    if not counts:
+        raise RuntimeError("생성된 PDF에서 페이지 수를 확인할 수 없습니다.")
+    return max(counts)
+
+
+def compile_typst(typ_content, font_paths):
+    """Typst 문자열을 임시 파일로 컴파일하고 PDF 바이트를 반환한다."""
+    with tempfile.NamedTemporaryFile("w", suffix=".typ", encoding="utf-8", delete=False) as tmp:
+        tmp.write(typ_content)
+        tmp_path = tmp.name
+    try:
+        return typst.compile(tmp_path, font_paths=font_paths)
+    finally:
+        os.remove(tmp_path)
+
+
+def fit_one_page(build, font_paths):
+    """가독성 범위 안에서 가장 큰 1페이지 레이아웃을 이진 탐색한다."""
+    low = MIN_LAYOUT_SCALE
+    high = MAX_LAYOUT_SCALE
+
+    low_typ = build(low)
+    low_pdf = compile_typst(low_typ, font_paths)
+    low_pages = pdf_page_count(low_pdf)
+    if low_pages > 1:
+        raise RuntimeError(
+            f"최소 가독성 배율({low:.2f}, 본문 약 {8.5 * low:.1f}pt)에서도 "
+            f"{low_pages}페이지입니다. 글자 크기를 더 줄이지 말고 본문을 축약하세요."
+        )
+
+    high_typ = build(high)
+    high_pdf = compile_typst(high_typ, font_paths)
+    if pdf_page_count(high_pdf) == 1:
+        return high, high_typ, high_pdf
+
+    best_scale, best_typ, best_pdf = low, low_typ, low_pdf
+    for _ in range(FIT_ITERATIONS):
+        middle = (low + high) / 2
+        middle_typ = build(middle)
+        middle_pdf = compile_typst(middle_typ, font_paths)
+        if pdf_page_count(middle_pdf) == 1:
+            best_scale, best_typ, best_pdf = middle, middle_typ, middle_pdf
+            low = middle
+        else:
+            high = middle
+    return best_scale, best_typ, best_pdf
+
+
 def main():
-    p = argparse.ArgumentParser(description="cover-letter-pitch 자기소개서(.md)를 A4 1장 PDF로 변환")
+    p = argparse.ArgumentParser(description="자기소개서(.md)를 적응형 레이아웃의 A4 1장 PDF로 변환")
     p.add_argument("markdown_file", help="자기소개서 마크다운 파일 (예: cover-letters/토스-백엔드.md)")
     p.add_argument("-o", "--output", help="출력 PDF 경로 (기본: 같은 폴더의 같은 이름 .pdf)")
     p.add_argument("--company", help="회사명 (기본: 파일명에서 추출)")
@@ -305,21 +369,27 @@ def main():
         if sep:
             links.append((label.strip(), url.strip()))
 
-    typ_content = build_typst(intro, sections, company, role, args.name, links)
     pdf_path = Path(args.output).resolve() if args.output else md_path.with_suffix(".pdf")
     font_paths = resolve_font_paths(not args.no_font_download)
 
-    with tempfile.NamedTemporaryFile("w", suffix=".typ", encoding="utf-8", delete=False) as tmp:
-        tmp.write(typ_content)
-        tmp_path = tmp.name
-    try:
-        typst.compile(tmp_path, output=str(pdf_path), font_paths=font_paths)
-    finally:
-        if args.keep_typ:
-            Path(tmp_path).replace(pdf_path.with_suffix(".typ"))
-        else:
-            os.remove(tmp_path)
+    def build(scale):
+        return build_typst(intro, sections, company, role, args.name, links, scale)
 
+    try:
+        layout_scale, typ_content, pdf_bytes = fit_one_page(build, font_paths)
+    except RuntimeError as error:
+        print(f"[ERROR] {error}", file=sys.stderr)
+        sys.exit(2)
+
+    pdf_path.write_bytes(pdf_bytes)
+    if args.keep_typ:
+        pdf_path.with_suffix(".typ").write_text(typ_content, encoding="utf-8")
+
+    print(
+        f"[INFO] 자동 레이아웃 배율: {layout_scale:.3f} "
+        f"(본문 약 {8.5 * layout_scale:.1f}pt, 1 page)",
+        file=sys.stderr,
+    )
     print(f"[SUCCESS] Generated: {pdf_path}")
 
 

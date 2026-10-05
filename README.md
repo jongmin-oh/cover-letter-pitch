@@ -299,6 +299,8 @@ uv run scripts/export_pdf.py cover-letters/토스-백엔드.md --name 홍길동 
 ```
 
 - 별도 설정이 필요 없습니다. `uv run`이 `typst`를 자동 설치하고, Pretendard가 없으면 첫 실행 때 `~/.cache/cover-letter-pitch/fonts`에 자동으로 내려받습니다.
+- 글자 크기와 간격을 가독성 범위에서 자동 조정해, 가능한 한 여백을 줄인 가장 큰 A4 1페이지 레이아웃을 선택합니다.
+- 최소 본문 크기인 약 8pt에서도 2페이지가 되면 작게 우겨 넣지 않고 축약이 필요하다는 오류를 냅니다. 반대로 짧은 글도 과도하게 확대하지 않고 읽기 좋은 상한에서 멈춥니다.
 - 회사명·포지션은 파일명(`{회사명}-{포지션}.md`)에서 읽습니다. `--company`, `--role`로 바꿀 수 있습니다.
 - 옵션: `--name`, `--email`, `--github`, `--blog`, `--link 라벨=URL`(반복 가능), `-o 출력경로`, `--no-font-download`
 
