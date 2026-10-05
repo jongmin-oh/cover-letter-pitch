@@ -88,7 +88,7 @@ JD 입력 + 후보자 경험
 
 ## 설치
 
-이 저장소는 Codex와 Claude Code가 함께 읽을 수 있는 `SKILL.md` 형식으로 작성되어 있습니다. 사용하는 도구의 스킬 디렉터리에 저장소를 클론하면 됩니다.
+이 저장소는 Codex와 Claude Code가 함께 읽는 **하나의 공용 스킬 패키지**입니다. 저장소 안에 도구별 복제본을 두지 않으며, 사용하는 도구의 스킬 디렉터리를 클론 목적지로 지정합니다. 두 도구를 모두 사용한다면 각각의 경로에 한 번씩 클론합니다.
 
 ### Codex
 
@@ -117,17 +117,6 @@ git clone https://github.com/jongmin-oh/cover-letter-pitch .claude/skills/cover-
 ```
 
 다음 세션부터 자동 로드됩니다. `/cover-letter-pitch` 로 호출하거나, 그냥 "이 JD로 자기소개서 써줘"라고 요청하면 description 트리거로 자동 호출됩니다.
-
-#### 플러그인으로 로컬 테스트
-
-레포에 `.claude-plugin/plugin.json` 매니페스트가 있어 플러그인으로도 로드됩니다. 설치 없이 바로 띄워 테스트할 때 유용합니다.
-
-```bash
-# 레포를 클론한 위치에서
-claude --plugin-dir /path/to/cover-letter-pitch
-```
-
-플러그인으로 로드하면 스킬이 네임스페이스로 호출됩니다 — `/cover-letter-pitch:cover-letter-pitch`. (정확한 이름은 `/help`에서 확인 가능합니다.)
 
 ### Claude (claude.ai)
 
